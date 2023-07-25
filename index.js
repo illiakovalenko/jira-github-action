@@ -1,2 +1,2 @@
 console.log('test');
-console.log(process.env.TEST_ONE, process.env.TEST_TWO);
+console.log(JSON.stringify(process.env.GITHUB, null, 2));
