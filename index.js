@@ -1,5 +1,7 @@
 const github = JSON.parse(process.env.GITHUB);
 
+// test
+
 (async () => {
   const event = github.event.issue || github.event.pull_request;
 
