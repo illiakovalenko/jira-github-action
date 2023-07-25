@@ -2,7 +2,7 @@ const github = JSON.parse(process.env.GITHUB);
 
 const getFieldValue = (text, start, end) => {
   return text
-    .match(new RegExp(`^### ${start}\\s\([\\s\\S]*\)\\s${end}$`, "m"))[1]
+    .match(new RegExp(`^${start}\\s\([\\s\\S]*\)\\s${end}$`, "m"))[1]
     .replace(/<!--- | -->/gm, "");
 };
 
