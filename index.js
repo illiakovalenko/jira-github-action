@@ -3,9 +3,7 @@ const github = JSON.parse(process.env.GITHUB);
 const JIRA_ISSUE_TYPE = Object.freeze([
   {
     type: "bug",
-    validate(ev) {
-      return ev.issue && ev.issue.labels.includes(this.type);
-    },
+    validate: (ev) => ev.issue && ev.issue.labels.includes("🐞 bug"),
   },
   {
     type: "task",
@@ -13,9 +11,7 @@ const JIRA_ISSUE_TYPE = Object.freeze([
   },
   {
     type: "doc",
-    validate(ev) {
-      return ev.issue && ev.issue.labels.includes(this.type);
-    },
+    validate: (ev) => ev.issue && ev.issue.labels.includes("📑 doc"),
   },
 ]);
 
