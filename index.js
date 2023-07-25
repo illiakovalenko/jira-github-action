@@ -12,7 +12,7 @@ const JIRA_ISSUE_TYPE = Object.freeze([
     validate: (ev) =>
       ev.issue && ev.issue.labels.some((l) => l.name === "🐞 bug"),
     body(ev) {
-      const getValue = () =>
+      const getValue = (start, end) =>
         getFieldValue(ev.body, `### ${start}`, end ? `### ${end}` : "");
 
       return {
@@ -36,7 +36,7 @@ const JIRA_ISSUE_TYPE = Object.freeze([
     type: "PR",
     validate: (ev) => !!ev.pull_request,
     body(ev) {
-      const getValue = () =>
+      const getValue = (start, end) =>
         getFieldValue(ev.body, `## ${start}`, end ? `## ${end}` : "");
 
       return {
@@ -56,7 +56,7 @@ const JIRA_ISSUE_TYPE = Object.freeze([
     validate: (ev) =>
       ev.issue && ev.issue.labels.some((l) => l.name === "📑 doc"),
     body(ev) {
-      const getValue = () =>
+      const getValue = (start, end) =>
         getFieldValue(ev.body, `### ${start}`, end ? `### ${end}` : "");
 
       return {
