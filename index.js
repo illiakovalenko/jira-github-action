@@ -2,19 +2,16 @@
 // console.log(JSON.stringify(process.env.GITHUB, null, 2));
 const github = process.env.GITHUB;
 
-const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN,
-})
+// const octokit = new Octokit({
+//   auth: process.env.GITHUB_TOKEN,
+// })
 
 (async () => {
-  const res = await octokit.request(
-    "GET /repos/{owner}/{repo}/collaborators/{username}",
-    {
-      owner: "Sitecore",
-      repo: "jss",
-      username: github.event.issue.user.login,
+  const res = await fetch(`https://api.github.com/repos/Sitecore/jss/collaborators/${github.event.issue.user.login}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
     }
-  );
+  })
 
   console.log(res);
 })();
