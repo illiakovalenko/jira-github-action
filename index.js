@@ -4,6 +4,8 @@ function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+// test
+
 const getFieldValue = (text, start, end) => {
   return text
     .match(
