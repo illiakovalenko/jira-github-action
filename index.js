@@ -7,6 +7,8 @@ const github = JSON.parse(process.env.GITHUB);
 // })
 
 (async () => {
+  console.log(github.event.issue.user.login, github.token, process.env.GITHUB_TOKEN);
+
   const res = await fetch(`https://api.github.com/repos/Sitecore/jss/collaborators/${github.event.issue.user.login}`, {
     headers: {
       Authorization: `Bearer ${github.token}`
