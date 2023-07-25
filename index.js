@@ -1,3 +1,5 @@
+const github = JSON.parse(process.env.GITHUB);
+
 const JIRA_ISSUE_TYPE = Object.freeze([
   {
     type: "bug",
