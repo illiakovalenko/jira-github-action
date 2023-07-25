@@ -16,7 +16,7 @@ const getFieldValue = (text, start, end) => {
         "m"
       )
     )[1]
-    .replace(/<!--- | -->/gm, "");
+    .replace(/^<!---.*-->$/gm, "");
 };
 
 const JIRA_ISSUE_TYPE = Object.freeze([
