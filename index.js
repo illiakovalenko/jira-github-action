@@ -117,10 +117,13 @@ const JIRA_ISSUE_TYPE = Object.freeze([
     process.exit(1);
   }
 
-  console.log(event.body);
-
   // don't create Jira issue if PR is created by admin
-  // if (github.event.pull_request && userInfoRes.permission === 'admin') return;
+  if (github.event.pull_request && userInfoRes.permission === "admin") {
+    console.log(
+      "Skipped Jira issue creation, since the Pull Request was created by admin"
+    );
+    return;
+  }
 
   try {
     await fetch(process.env.JIRA_WEBHOOK_URL, {
