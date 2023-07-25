@@ -9,7 +9,7 @@ const github = process.env.GITHUB;
 (async () => {
   const res = await fetch(`https://api.github.com/repos/Sitecore/jss/collaborators/${github.event.issue.user.login}`, {
     headers: {
-      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
+      Authorization: `Bearer ${github.token}`
     }
   })
 
