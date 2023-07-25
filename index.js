@@ -42,20 +42,22 @@ const JIRA_ISSUE_TYPE = Object.freeze([
   // if (github.event.pull_request && isUserCollaborator) return;
 
   try {
-    const res = await fetch(process.env.JIRA_WEBHOOK_URL, {
+    await fetch(process.env.JIRA_WEBHOOK_URL, {
       method: "POST",
       body: JSON.stringify({
-        summary: event.title,
-        description: event.body,
-        link: event.url,
-        type: jiraIssueType,
+        fields: {
+          summary: event.title,
+          description: event.body,
+          link: event.url,
+          type: jiraIssueType,
+        }
       }),
     });
-
-    console.log(res)
     console.log("success");
   } catch (error) {
     console.log("Error occurred while creating Jira issue", error);
     process.exit(1);
   }
+
+  console.log('success');
 })();
