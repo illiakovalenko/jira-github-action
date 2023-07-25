@@ -1,27 +1,60 @@
 const github = JSON.parse(process.env.GITHUB);
 
-// test
+const JIRA_ISSUE_TYPE = Object.freeze([
+  {
+    type: "bug",
+    validate: (ev) => ev.issue && ev.issue.labels.some(l => l.name === "🐞 bug"),
+  },
+  {
+    type: "task",
+    validate: (ev) => !!ev.pull_request,
+  },
+  {
+    type: "doc",
+    validate: (ev) => ev.issue && ev.issue.labels.some(l => l.name === "📑 doc"),
+  },
+]);
 
 (async () => {
+  const jiraIssueType = JIRA_ISSUE_TYPE.find((o) =>
+    o.validate(github.event)
+  ).type;
   const event = github.event.issue || github.event.pull_request;
 
-  const res = await fetch(
-    `https://api.github.com/repos/${github.event.repository.owner.login}/${github.event.repository.name}/collaborators/${event.user.login}`,
-    {
-      headers: {
-        Authorization: `Bearer ${github.token}`,
-      },
-    }
-  );
+  let userInfoRes;
+  try {
+    userInfoRes = await fetch(
+      `https://api.github.com/repos/${github.event.repository.owner.login}/${github.event.repository.name}/collaborators/${event.user.login}`,
+      {
+        headers: {
+          Authorization: `Bearer ${github.token}`,
+        },
+      }
+    );
+  } catch (error) {
+    console.log("Error occurred while fetching collabor information", error);
+    process.exit(1);
+  }
 
-  const isUserCollaborator = res.status === 204;
+  // const isUserCollaborator = userInfoRes.status === 204;
 
   // don't create Jira issue if PR is created by collaborator
   // if (github.event.pull_request && isUserCollaborator) return;
 
-  console.log('IS ISSUE', !!github.event.issue);
-  console.log('IS PR', !!github.event.pull_request);
-  console.log('USER', event.user.login);
-  console.log('IS COLLABORATOR', isUserCollaborator);
-  console.log(res);
+  try {
+    await fetch(process.env.JIRA_WEBHOOK_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        fields: {
+          summary: event.title,
+          description: event.body,
+          link: event.html_url,
+          type: jiraIssueType,
+        }
+      }),
+    });
+  } catch (error) {
+    console.log("Error occurred while creating Jira issue", error);
+    process.exit(1);
+  }
 })();
