@@ -41,9 +41,8 @@ const JIRA_ISSUE_TYPE = Object.freeze([
   // don't create Jira issue if PR is created by collaborator
   // if (github.event.pull_request && isUserCollaborator) return;
 
-  let webhookRes;
   try {
-    await fetch(process.env.JIRA_WEBHOOK_URL, {
+    const res = await fetch(process.env.JIRA_WEBHOOK_URL, {
       method: "POST",
       body: JSON.stringify({
         summary: event.title,
@@ -53,11 +52,10 @@ const JIRA_ISSUE_TYPE = Object.freeze([
       }),
     });
 
+    console.log(res)
     console.log("success");
   } catch (error) {
     console.log("Error occurred while creating Jira issue", error);
     process.exit(1);
   }
-
-  console.log(webhookRes ? "success" : "failed");
 })();
