@@ -48,16 +48,13 @@ const JIRA_ISSUE_TYPE = Object.freeze([
         fields: {
           summary: event.title,
           description: event.body,
-          link: event.url,
+          link: event.html_url,
           type: jiraIssueType,
         }
       }),
     });
-    console.log("success");
   } catch (error) {
     console.log("Error occurred while creating Jira issue", error);
     process.exit(1);
   }
-
-  console.log('success');
 })();
