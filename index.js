@@ -41,13 +41,15 @@ const JIRA_ISSUE_TYPE = Object.freeze([
   // don't create Jira issue if PR is created by collaborator
   // if (github.event.pull_request && isUserCollaborator) return;
 
+  console.log(event.body);
+
   try {
     await fetch(process.env.JIRA_WEBHOOK_URL, {
       method: "POST",
       body: JSON.stringify({
         fields: {
           summary: event.title,
-          description: event.body.join(''),
+          description: event.body,
           link: event.html_url,
           type: jiraIssueType,
         }
