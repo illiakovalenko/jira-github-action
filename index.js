@@ -33,6 +33,7 @@ const JIRA_ISSUE_TYPE = Object.freeze([
     );
   } catch (error) {
     console.log("Error occurred while fetching collabor information", error);
+    process.exit(1);
   }
 
   // const isUserCollaborator = userInfoRes.status === 204;
@@ -55,6 +56,7 @@ const JIRA_ISSUE_TYPE = Object.freeze([
     console.log("success");
   } catch (error) {
     console.log("Error occurred while creating Jira issue", error);
+    process.exit(1);
   }
 
   console.log(webhookRes ? "success" : "failed");
