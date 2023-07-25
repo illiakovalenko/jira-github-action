@@ -1,5 +1,3 @@
-const github = JSON.parse(process.env.GITHUB);
-
 const JIRA_ISSUE_TYPE = Object.freeze([
   {
     type: "bug",
@@ -74,7 +72,6 @@ const JIRA_ISSUE_TYPE = Object.freeze([
 
   // don't create Jira issue if PR is created by collaborator
   // if (github.event.pull_request && isUserCollaborator) return;
-
   try {
     await fetch(process.env.JIRA_WEBHOOK_URL, {
       method: "POST",
