@@ -36,6 +36,8 @@ const JIRA_ISSUE_TYPE = Object.freeze([
     process.exit(1);
   }
 
+  // test
+
   // const isUserCollaborator = userInfoRes.status === 204;
 
   // don't create Jira issue if PR is created by collaborator
