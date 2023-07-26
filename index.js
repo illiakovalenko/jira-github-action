@@ -1,20 +1,41 @@
 const github = JSON.parse(process.env.GITHUB);
 
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+const formatDescription = (description) => {
+  const header = (text) =>
+    Array.from(Array(6)).reduce((currText, i) => {
+      return currText.replace(
+        new RegExp(`^#{${i + 1}}\s`, "gm"),
+        `h${i + 1}. `
+      );
+    }, text);
 
-const getFieldValue = (text, start, end) => {
-  return text
-    .match(
-      new RegExp(
-        `^${escapeRegExp(start)}\\s\([\\s\\S]*\)${
-          end ? escapeRegExp(end) : ".*"
-        }$`,
-        "m"
-      )
-    )[1]
-    .replace(/^<!---.*-->$/gm, "");
+  const boldText = (text) => text.replace(/\*\*(.*)\*\*/gm, "*$1*");
+
+  const quote = (text) => text.replace(/^>\s/gm, "bq. ");
+
+  const link = (text) =>
+    text.replace(/\[([^download].*)\]\((.*)\)/gm, "[$1|$2]");
+
+  const image = (text) => text.replace(/!\[download\]\((.*)\)/gm, "!$1!");
+
+  const codeBlock = (text) =>
+    text.replace(/```(\w+)([\s\S]*)```/gm, "{code:$1}$2{code}");
+
+  const inlineCodeBlock = (text) =>
+    text.replace(/`([^`\n]+)`/gm, "{noformat}$1{noformat}");
+
+  const comment = (text) => text.replace(/^<!---.*-->$/gm, "");
+
+  return [
+    header,
+    boldText,
+    quote,
+    link,
+    image,
+    codeBlock,
+    inlineCodeBlock,
+    comment,
+  ].reduce((currText, fn) => fn(currText), description);
 };
 
 const JIRA_ISSUE_TYPE = Object.freeze([
@@ -22,78 +43,22 @@ const JIRA_ISSUE_TYPE = Object.freeze([
     type: "bug",
     validate: (ev) =>
       ev.issue && ev.issue.labels.some((l) => l.name === "🐞 bug"),
-    body(ev) {
-      const getValue = (start, end) =>
-        getFieldValue(ev.body, `### ${start}`, end ? `### ${end}` : "");
-
-      return {
-        fields: {
-          summary: ev.title,
-          description: getValue("Describe the Bug", "To Reproduce"),
-          toReproduce: getValue("To Reproduce", "Expected Behavior"),
-          expectedBehavior: getValue("Expected Behavior", "Possible Fix"),
-          possibleFix: getValue(
-            "Possible Fix",
-            "Provide environment information"
-          ),
-          environmentInformation: getValue("Provide environment information"),
-          link: ev.html_url,
-          type: this.type,
-        },
-      };
-    },
   },
   {
     type: "PR",
     validate: (ev) => !!ev.pull_request,
-    body(ev) {
-      const getValue = (start, end) =>
-        getFieldValue(ev.body, `## ${start}`, end ? `## ${end}` : "");
-
-      return {
-        fields: {
-          summary: ev.title,
-          description: getValue("Description / Motivation", "Testing Details"),
-          testingDetails: getValue("Testing Details", "Types of changes"),
-          changeType: getValue("Types of changes"),
-          link: ev.html_url,
-          type: this.type,
-        },
-      };
-    },
   },
   {
     type: "doc",
     validate: (ev) =>
       ev.issue && ev.issue.labels.some((l) => l.name === "📑 doc"),
-    body(ev) {
-      const getValue = (start, end) =>
-        getFieldValue(ev.body, `### ${start}`, end ? `### ${end}` : "");
-
-      return {
-        fields: {
-          summary: ev.title,
-          description: getValue(
-            "What is the improvement or update you wish to see?",
-            "Is there any context that might help us understand?"
-          ),
-          context: getValue(
-            "Is there any context that might help us understand?",
-            "Does the docs page already exist? Please link to it."
-          ),
-          docLink: getValue(
-            "Does the docs page already exist? Please link to it."
-          ),
-          link: ev.html_url,
-          type: this.type,
-        },
-      };
-    },
   },
 ]);
 
 (async () => {
-  const jiraIssueType = JIRA_ISSUE_TYPE.find((o) => o.validate(github.event));
+  const jiraIssueType = JIRA_ISSUE_TYPE.find((o) =>
+    o.validate(github.event)
+  ).type;
   const event = github.event.issue || github.event.pull_request;
 
   let userInfoRes;
@@ -124,7 +89,14 @@ const JIRA_ISSUE_TYPE = Object.freeze([
   try {
     await fetch(process.env.JIRA_WEBHOOK_URL, {
       method: "POST",
-      body: JSON.stringify(jiraIssueType.body(event)),
+      body: JSON.stringify({
+        fields: {
+          summary: event.title,
+          description: formatDescription(event.body),
+          link: event.html_url,
+          type: jiraIssueType,
+        },
+      }),
     });
   } catch (error) {
     console.log("Error occurred while creating Jira issue", error);
