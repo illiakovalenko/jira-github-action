@@ -2,9 +2,9 @@ const github = JSON.parse(process.env.GITHUB);
 
 const formatDescription = (description) => {
   const header = (text) =>
-    Array.from(Array(6)).reduce((currText, i) => {
+    Array.from(Array(6)).reduce((currText, _, i) => {
       return currText.replace(
-        new RegExp(`^#{${i + 1}}\s`, "gm"),
+        new RegExp(`^#{${i + 1}}\\s`, "gm"),
         `h${i + 1}. `
       );
     }, text);
