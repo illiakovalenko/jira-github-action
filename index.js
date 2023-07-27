@@ -42,7 +42,7 @@ const JIRA_ISSUE_TYPE = Object.freeze([
   {
     type: "bug",
     validate: (ev) =>
-      ev.issue && ev.issue.labels.some((l) => l.name === "🐞 bug"),
+      ev.issue && ev.issue.labels.some((l) => l.name.includes("bug")),
   },
   {
     type: "PR",
@@ -51,7 +51,7 @@ const JIRA_ISSUE_TYPE = Object.freeze([
   {
     type: "doc",
     validate: (ev) =>
-      ev.issue && ev.issue.labels.some((l) => l.name === "📑 doc"),
+      ev.issue && ev.issue.labels.some((l) => l.name.includes("doc")),
   },
 ]);
 
@@ -74,7 +74,7 @@ const JIRA_ISSUE_TYPE = Object.freeze([
 
     userInfoRes = await userInfoRes.json();
   } catch (error) {
-    console.log("Error occurred while fetching collabor information", error);
+    console.log("Error occurred while fetching user permission", error);
     process.exit(1);
   }
 
