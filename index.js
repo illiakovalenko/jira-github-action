@@ -55,6 +55,8 @@ const JIRA_ISSUE_TYPE = Object.freeze([
   },
 ]);
 
+// test
+
 (async () => {
   const jiraIssueType = JIRA_ISSUE_TYPE.find((o) =>
     o.validate(github.event)
